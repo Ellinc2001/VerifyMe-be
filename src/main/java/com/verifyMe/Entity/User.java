@@ -20,6 +20,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "name")
+    private String name;
+    
+    @Column(name = "surname")
+    private String surname;
+    
     @Column(unique = true, nullable = false)
     private String username;
 
@@ -40,11 +46,16 @@ public class User {
     private int checkFrequencyHours = 24;  // Frequenza di controllo in ore (default: ogni 24 ore)
     
     @Lob
-    @Column(name = "face_embedding", columnDefinition = "BYTEA")
-    private byte[] encryptedFaceEmbedding; // 🔹 Dati biometrici crittografati
+    @Column(name = "face_embedding")
+    @Basic(fetch = FetchType.LAZY)
+    private byte[] encryptedFaceEmbedding;
+
     
-    @Column(name = "last_scan_date")
+    @Column(name = "last_scan_date_yt")
     private LocalDateTime lastScanDateYt;
+    
+    @Column(name = "last_scan_date_ig")
+    private LocalDateTime lastScanDateIg;
 
     
     public Long getId() {
@@ -106,6 +117,30 @@ public class User {
     
     public void setLastScanDateYt(LocalDateTime lastScanDate) {
     	this.lastScanDateYt = lastScanDate;
+    }
+    
+    public LocalDateTime getLastScanDateIg() {
+    	return this.lastScanDateIg;
+    }
+    
+    public void setLastScanDateIg(LocalDateTime lastScanDateTimeIg) {
+    	this.lastScanDateIg = lastScanDateTimeIg;
+    }
+    
+    public String getName() {
+    	return this.name;
+    }
+    
+    public void setName(String name) {
+    	this.name = name;
+    }
+    
+    public String getSurname() {
+    	return this.surname;
+    }
+    
+    public void setSurname(String surname) {
+    	this.surname = surname;
     }
 
 

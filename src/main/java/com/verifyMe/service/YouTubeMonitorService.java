@@ -1,7 +1,9 @@
 package com.verifyMe.service;
 
+import com.verifyMe.Entity.DetectedContent;
 import com.verifyMe.Entity.IdentityTriggers;
 import com.verifyMe.Entity.User;
+import com.verifyMe.Repository.DetectedContentRepository;
 import com.verifyMe.Repository.IdentityTriggersRepository;
 import com.verifyMe.Repository.UserRepository;
 import com.verifyMe.Utils.FaceEmbeddingUtil;
@@ -33,6 +35,9 @@ public class YouTubeMonitorService {
 
     @Autowired
     private IdentityTriggersRepository triggersRepository;
+    
+    @Autowired
+    private DetectedContentRepository detectedContentRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -52,7 +57,7 @@ public class YouTubeMonitorService {
         String lastScanISO = lastScan.format(DateTimeFormatter.ISO_DATE_TIME) + "Z"; // Formato richiesto da YouTube
 
         // 🔹 Recuperiamo gli Identity Triggers associati
-        List<IdentityTriggers> triggersList = triggersRepository.findByUserId(userId);
+        List<IdentityTriggers> triggersList = triggersRepository.findByUserIdAndPlatform(userId, "YOUTUBE");
 
         for (IdentityTriggers trigger : triggersList) {
             List<String> queryKeywords = new ArrayList<>();
@@ -87,23 +92,39 @@ public class YouTubeMonitorService {
                 String videoId = item.get("id").get("videoId").asText();
                 String titolo = item.get("snippet").get("title").asText();
                 String descrizione = item.get("snippet").get("description").asText();
+                String videoUrl = "https://www.youtube.com/watch?v=" + videoId;
+
+                // 🔹 Verifica se il video è già stato segnalato
+                if (detectedContentRepository.existsByContentIdAndUserId(videoId, user.getId())) {
+                    continue; // Skippa se già segnalato
+                }
 
                 boolean isSuspicious = false;
+                boolean keywordMatch = false;
+                boolean faceMatch = false;
 
                 if (titolo.toLowerCase().contains(keyword.toLowerCase()) ||
                     descrizione.toLowerCase().contains(keyword.toLowerCase()) ||
                     verificaTags(keyword, videoId) ||
                     verificaCommenti(keyword, videoId)) {
                     isSuspicious = true;
+                    keywordMatch = true;
                 }
 
                 // 🔍 Controlliamo se la miniatura contiene il volto dell'utente
                 if (verificaMiniatura(videoId, user)) {
                     isSuspicious = true;
+                    faceMatch = true;
                 }
 
                 if (isSuspicious) {
-                    videoSospetti.add("⚠️ Video sospetto: " + titolo + " (https://www.youtube.com/watch?v=" + videoId + ")");
+                    // 🔹 Salva la segnalazione nel database
+                    DetectedContent detectedContent = new DetectedContent(
+                            user, "YOUTUBE", videoId, titolo, descrizione, videoUrl, faceMatch, keywordMatch
+                    );
+                    detectedContentRepository.save(detectedContent);
+
+                    videoSospetti.add("⚠️ Video sospetto: " + titolo + " (" + videoUrl + ")");
                 }
             }
         } catch (Exception e) {

@@ -21,12 +21,15 @@ public class IdentityTriggers {
     @Column(nullable = false)
     private String name;  // Nome principale dell'utente
 
-    @ElementCollection(fetch = FetchType.EAGER) // 🔹 Carica subito gli aliases
+    @Column(nullable = false)
+    private String platform;  // 🔹 Specifica il social network (YouTube, Instagram, TikTok...)
+
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "identity_aliases", joinColumns = @JoinColumn(name = "identity_trigger_id"))
     @Column(name = "alias")
     private List<String> aliases;  // Possibili varianti del nome
 
-    @ElementCollection(fetch = FetchType.EAGER) // 🔹 Anche qui se necessario
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "identity_keywords", joinColumns = @JoinColumn(name = "identity_trigger_id"))
     @Column(name = "keyword")
     private List<String> keywords;  // Parole chiave sospette
@@ -45,13 +48,13 @@ public class IdentityTriggers {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;  // Collegamento all'utente proprietario di questi triggers
 
-
     // ✅ Costruttore Vuoto
     public IdentityTriggers() {}
 
     // ✅ Costruttore Completo
-    public IdentityTriggers(String name, List<String> aliases, List<String> keywords, List<String> tags, List<String> suspectChannels, User user) {
+    public IdentityTriggers(String name, String platform, List<String> aliases, List<String> keywords, List<String> tags, List<String> suspectChannels, User user) {
         this.name = name;
+        this.platform = platform;
         this.aliases = aliases;
         this.keywords = keywords;
         this.tags = tags;
@@ -60,7 +63,6 @@ public class IdentityTriggers {
     }
 
     // ✅ Getter e Setter
-
     public Long getId() {
         return id;
     }
@@ -75,6 +77,14 @@ public class IdentityTriggers {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(String platform) {
+        this.platform = platform;
     }
 
     public List<String> getAliases() {

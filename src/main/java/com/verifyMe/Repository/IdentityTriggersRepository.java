@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface IdentityTriggersRepository extends JpaRepository<IdentityTriggers, Long> {
     List<IdentityTriggers> findByUserId(Long userId);
+    List<IdentityTriggers> findByUserIdAndPlatform(Long userId, String platform);
 }

@@ -10,6 +10,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 public class SecurityConfig {
@@ -24,14 +29,29 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable()) // 🔹 Disabilita CSRF per le API REST
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 🔹 Imposta JWT come stateless
+            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // 🔹 Abilita CORS
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 🔹 JWT è stateless
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/register", "/auth/login").permitAll() // 🔹 Permetti l'accesso senza autenticazione a questi endpoint
-                .anyRequest().authenticated() // 🔹 Tutte le altre richieste richiedono autenticazione
+                .requestMatchers("/auth/register", "/auth/login").permitAll() // 🔹 Accesso libero a login/registrazione
+                .anyRequest().authenticated() // 🔹 Tutto il resto richiede autenticazione
             )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // 🔹 Aggiungi il filtro JWT
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // 🔹 Aggiunge il filtro JWT
 
         return http.build();
+    }
+
+    // 🔹 Configurazione CORS per accettare richieste da localhost:4200
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("http://localhost:8100")); // 🔥 Accetta richieste da Angular
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 🔹 Metodi permessi
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type")); // 🔹 Header permessi
+        config.setAllowCredentials(true); // 🔹 Permette l'invio di credenziali (JWT)
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
     @Bean
