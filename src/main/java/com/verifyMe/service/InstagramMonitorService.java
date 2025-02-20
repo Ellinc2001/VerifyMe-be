@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class InstagramMonitorService {
+public class InstagramMonitorService implements InstagramMonitorServiceI{
 
     private final String ACCESS_TOKEN = "LA_TUA_INSTAGRAM_ACCESS_TOKEN";
     private final String SEARCH_URL = "https://graph.instagram.com/me/media?fields=id,caption,media_url,timestamp,permalink&access_token=";
@@ -42,6 +42,7 @@ public class InstagramMonitorService {
     @Autowired
     private UserRepository userRepository;
 
+    @Override
     @Transactional
     public List<String> cercaPostPerUtente(Long userId) {
         List<String> postSospetti = new ArrayList<>();

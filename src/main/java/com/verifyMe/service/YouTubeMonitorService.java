@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Service
-public class YouTubeMonitorService {
+public class YouTubeMonitorService implements YoutubeMonitorServiceI{
 
     private final String API_KEY = "LA_TUA_API_KEY";
     private final String SEARCH_URL = "https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&order=date&maxResults=10&q=";
@@ -42,6 +42,7 @@ public class YouTubeMonitorService {
     @Autowired
     private UserRepository userRepository;
 
+    @Override
     @Transactional
     public List<String> cercaVideoPerUtente(Long userId) {
         List<String> videoSospetti = new ArrayList<>();

@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
-public class InsightsService {
+public class InsightsService implements InsightsServiceI{
 
     @Autowired
     private DetectedContentRepository detectedContentRepository;
@@ -24,6 +24,7 @@ public class InsightsService {
     @Autowired 
     private UserRepository usr;
 
+    @Override
     public Map<String, Integer> getInsights() {
         Map<String, Integer> insights = new HashMap<>();
 
@@ -34,7 +35,7 @@ public class InsightsService {
         return insights;
     }
     
-    
+    @Override
     public Map<String, Map<String, Integer>> getInsightsForUser(String username) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startOfCurrentMonth = now.withDayOfMonth(1);

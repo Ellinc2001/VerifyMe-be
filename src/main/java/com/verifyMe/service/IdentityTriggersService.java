@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class IdentityTriggersService {
+public class IdentityTriggersService implements IdentityTriggerServiceI{
 
     private final IdentityTriggersRepository triggersRepository;
     private final UserRepository userRepository;
@@ -22,11 +22,13 @@ public class IdentityTriggersService {
     }
 
     // 🔹 Trova tutti gli Identity Triggers di un utente
+    @Override
     public List<IdentityTriggers> getTriggersByUserId(Long userId) {
         return triggersRepository.findByUserId(userId);
     }
 
     // 🔹 Crea un nuovo Identity Trigger per un utente
+    @Override
     public IdentityTriggers createTrigger(Long userId, IdentityTriggers trigger) {
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isPresent()) {
@@ -38,6 +40,7 @@ public class IdentityTriggersService {
     }
 
     // 🔹 Aggiorna un Identity Trigger
+    @Override
     public IdentityTriggers updateTrigger(Long triggerId, IdentityTriggers updatedTrigger) {
         return triggersRepository.findById(triggerId)
                 .map(trigger -> {
@@ -51,6 +54,7 @@ public class IdentityTriggersService {
     }
 
     // 🔹 Elimina un Identity Trigger
+    @Override
     public void deleteTrigger(Long triggerId) {
         triggersRepository.deleteById(triggerId);
     }

@@ -42,6 +42,9 @@ public class DetectedContent {
 
     @Column(nullable = false)
     private Boolean keywordMatch; // Indica se il contenuto è stato individuato tramite parole chiave
+    
+    @Column(nullable = false)
+    private Boolean isCritical;
 
     public DetectedContent() {
     	
@@ -130,5 +133,13 @@ public class DetectedContent {
     
     public void setKeyWordsMatch(Boolean keyWordMatch) {
     	this.keywordMatch = keyWordMatch;
+    }
+    
+    public Boolean getIsCritical() {
+    	return this.isCritical;
+    }
+    
+    public void setIsCritical(Boolean isCritical) {
+    	this.isCritical = isCritical;
     }
 }
