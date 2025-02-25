@@ -21,10 +21,16 @@ public class IdentityTriggersService implements IdentityTriggerServiceI{
         this.userRepository = userRepository;
     }
 
-    // 🔹 Trova tutti gli Identity Triggers di un utente
+    
     @Override
-    public List<IdentityTriggers> getTriggersByUserId(Long userId) {
-        return triggersRepository.findByUserId(userId);
+    public List<IdentityTriggers> getTriggersByUserId(String username) throws Exception {
+    	Optional<User> optU = this.userRepository.findByUsername(username);
+    	if(optU.isEmpty()) {
+    		throw new Exception("Utente inesistente");
+    	} else {
+    		User u = optU.get();
+            return triggersRepository.findByUserId(u.getId());
+    	}
     }
 
     // 🔹 Crea un nuovo Identity Trigger per un utente

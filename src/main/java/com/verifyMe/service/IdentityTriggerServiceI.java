@@ -6,7 +6,7 @@ import com.verifyMe.Entity.IdentityTriggers;
 
 public interface IdentityTriggerServiceI {
 
-	List<IdentityTriggers> getTriggersByUserId(Long userId);
+	List<IdentityTriggers> getTriggersByUserId(String username) throws Exception;
 
 	IdentityTriggers updateTrigger(Long triggerId, IdentityTriggers updatedTrigger);
 
